@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Examer1</title>
+  <style>
+    :root {
+      --bg:      #1a2332;
+      --surface: #1e2a3a;
+      --overlay: #263445;
+      --border:  #354d63;
+      --text:    #d4e6f1;
+      --subtext: #6b8fa8;
+      --accent:  #2ecc9a;
+      --green:   #2ecc9a;
+      --red:     #f06a72;
+      --blue:    #5ba8d4;
+      --radius:  10px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Malgun Gothic', 'Segoe UI', sans-serif;
+      font-size: 14px;
+      min-height: 100vh;
+      padding: 24px 16px 60px;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+
+    /* ── 헤더 ── */
+    header { display: flex; align-items: center; gap: 12px; }
+    header h1 { font-size: 22px; font-weight: 700; letter-spacing: 1px; color: var(--accent); }
+    .cafe-link {
+      margin-left: auto;
+      font-size: 12px; font-weight: 700;
+      color: #03c75a;
+      text-decoration: none;
+      border: 1px solid #03c75a;
+      border-radius: 6px;
+      padding: 4px 10px;
+      white-space: nowrap;
+      transition: background .15s, border-color .15s;
+    }
+    .cafe-link:hover { background: rgba(3,199,90,.12); border-color: var(--accent); }
+    .download-link {
+      font-size: 12px; font-weight: 700;
+      color: var(--blue);
+      text-decoration: none;
+      border: 1px solid var(--blue);
+      border-radius: 6px;
+      padding: 4px 10px;
+      white-space: nowrap;
+      transition: background .15s, border-color .15s;
+    }
+    .download-link:hover { background: rgba(137,180,250,.12); border-color: var(--accent); }
+    #guide-toggle:hover { border-color: var(--accent) !important; color: var(--text); }
+    #server-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--subtext); flex-shrink: 0;
+      transition: background .3s;
+    }
+    #server-dot.ok  { background: var(--green); }
+    #server-dot.err { background: var(--red); }
+    #server-label { font-size: 12px; color: var(--subtext); }
+
+    /* ── 카드 ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display: flex; flex-direction: column; gap: 12px;
+    }
+    .card-title { font-size: 12px; font-weight: 700; color: var(--subtext); text-transform: uppercase; letter-spacing: .8px; }
+
+    /* ── 폼 그리드 ── */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+    label { font-size: 12px; color: var(--subtext); display: block; margin-bottom: 4px; }
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      background: var(--overlay);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text);
+      font-size: 13px;
+      padding: 7px 10px;
+      outline: none;
+    }
+    input:hover, select:hover { border-color: var(--accent); background: var(--border); }
+    input:focus, select:focus { border-color: var(--accent); }
+    select option { background: var(--bg); }
+
+    /* ── 업로드 ── */
+    #drop-zone {
+      border: 2px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 32px;
+      text-align: center;
+      cursor: pointer;
+      color: var(--subtext);
+      transition: border-color .2s, background .2s;
+    }
+    #drop-zone.over, #drop-zone:hover { border-color: var(--accent); background: rgba(250,179,135,.05); }
+    #drop-zone.ready { border-color: var(--green); color: var(--green); }
+    #drop-zone .icon { font-size: 32px; margin-bottom: 8px; }
+    #file-input { display: none; }
+
+    /* ── 버튼 ── */
+    .btn {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      background: var(--overlay);
+      color: var(--text);
+      font-size: 14px;
+      font-weight: 700;
+      padding: 10px 18px;
+      cursor: pointer;
+      transition: background .15s, border-color .15s;
+      font-family: inherit;
+    }
+    .btn:hover:not(:disabled) { background: var(--border); border-color: var(--accent); }
+    .btn:disabled { opacity: .4; cursor: not-allowed; }
+    .btn.primary { background: var(--accent); color: #1e1e2e; border-color: var(--accent); }
+    .btn.primary:hover:not(:disabled) { filter: brightness(1.15); border-color: var(--text); box-shadow: 0 0 0 2px var(--accent); }
+    .btn.success { background: var(--green); color: #1e1e2e; border-color: var(--green); }
+    .btn.success:hover:not(:disabled) { filter: brightness(1.15); border-color: var(--text); box-shadow: 0 0 0 2px var(--green); }
+    .btn-row { display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* ── 진행바 ── */
+    #progress-wrap { display: none; flex-direction: column; gap: 6px; }
+    #progress-bar-track {
+      height: 6px; border-radius: 3px;
+      background: var(--overlay); overflow: hidden;
+    }
+    #progress-bar {
+      height: 100%; border-radius: 3px;
+      background: var(--accent);
+      width: 0%; transition: width .4s;
+    }
+    #progress-bar.indeterminate {
+      width: 40% !important;
+      animation: slide 1.2s ease-in-out infinite alternate;
+    }
+    @keyframes slide { from { margin-left: -40%; } to { margin-left: 100%; } }
+    #progress-label { font-size: 12px; color: var(--subtext); }
+
+    /* ── 로그 ── */
+    #log-box {
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+      height: 160px;
+      overflow-y: auto;
+      font-size: 12px;
+      font-family: 'Consolas', monospace;
+      color: var(--subtext);
+      display: none;
+    }
+    #log-box .log-line { padding: 1px 0; }
+    #log-box .log-line.err { color: var(--red); }
+    #log-box .log-line.ok  { color: var(--green); }
+
+    /* ── 모달 ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.55);
+      z-index: 100;
+      align-items: center; justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 24px 28px;
+      max-width: 420px; width: 90%;
+      position: relative;
+    }
+    .modal-box h3 { font-size: 15px; font-weight: 700; color: var(--accent); margin-bottom: 16px; }
+    .modal-box ol { padding-left: 20px; display: flex; flex-direction: column; gap: 10px; line-height: 1.6; }
+    .modal-box ol li { font-size: 13px; }
+    .modal-box a { color: var(--blue); text-decoration: underline; }
+    .modal-close {
+      position: absolute; top: 12px; right: 14px;
+      background: none; border: none; color: var(--subtext);
+      font-size: 18px; cursor: pointer; line-height: 1;
+    }
+    .modal-close:hover { color: var(--text); }
+    .link-subtle {
+      font-size: 11px; color: var(--blue);
+      text-decoration: underline; cursor: pointer;
+      margin-left: 6px; font-weight: 400;
+    }
+
+    /* ── 결과 뱃지 ── */
+    #result-badge {
+      display: none;
+      background: rgba(166,227,161,.12);
+      border: 1px solid var(--green);
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--green);
+      font-size: 13px;
+    }
+
+    /* ── HWP 섹션 ── */
+    #hwp-section { display: none; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+
+  <!-- 헤더 -->
+  <header>
+    <a href="index.html" title="홈으로" style="font-size:20px;text-decoration:none;color:var(--subtext);margin-right:4px;line-height:1;" onmouseover="this.style.color='var(--accent)'" onmouseout="this.style.color='var(--subtext)'">🏠</a>
+    <h1>Examer1</h1>
+    <div id="server-dot"></div>
+    <span id="server-label">서버 확인 중…</span>
+    <span style="display:flex;align-items:center;gap:4px;margin-left:auto;">
+      <span style="font-size:12px;color:var(--subtext);">오류/기능추가 요청은</span>
+      <a class="cafe-link" href="https://cafe.naver.com/examer1" target="_blank">네이버 카페</a>
+    </span>
+  </header>
+
+  <!-- 사용 안내 -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
+    <div style="display:flex;align-items:center;">
+      <span style="font-size:12px;color:var(--subtext);font-weight:700;">사용 방법</span>
+      <button onclick="toggleGuide()" id="guide-toggle" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;color:var(--subtext);font-size:11px;padding:2px 8px;cursor:pointer;">도움말 열기</button>
+    </div>
+    <div id="guide-body" style="display:none;flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">1.</span><a class="download-link" href="https://github.com/lighapuro/examer1/releases/download/examer1/examer1.zip" target="_blank">로컬서버 실행화일 다운로드</a></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">2.</span><span style="font-size:13px;color:var(--subtext);">압축을 푼 후에 <strong style="color:var(--text);">examer1_pc.exe</strong> 를 실행</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;visibility:hidden;">2.</span><span style="font-size:12px;color:var(--subtext);opacity:.7;">(작은 창이 뜨고 로그가 보임. 정상)</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;visibility:hidden;">2.</span><span style="font-size:12px;color:var(--subtext);opacity:.7;">(위의 서버상태가 "로컬 서버 연결 안 됨"에서 "로컬 서버 연결됨"으로 바뀜)</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">3.</span><span style="font-size:13px;color:var(--subtext);">아래에서 분석한 후</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">4.</span><span style="font-size:13px;color:var(--subtext);">분석이 완료되면 저장폴더를 지정(직접 입력 또는 탐색기에서 복사해와서 붙여넣기) 후 한글 생성 클릭.</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">5.</span><span style="font-size:13px;color:var(--subtext);">1~2초 후 한글 프로그램이 뜨면서 한글문서 생성 시작.</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;visibility:hidden;">5.</span><span style="font-size:12px;color:var(--subtext);opacity:.7;">(한글 프로그램 접근 허용 팝업이 뜨는 경우 <a href="https://ligh1.tistory.com/203" target="_blank" style="color:var(--blue);">여기</a>를 참조하세요)</span></div>
+    </div>
+  </div>
+
+  <!-- 설정 -->
+  <div class="card" id="settings-card">
+    <div class="card-title">설정</div>
+    <div class="grid3">
+      <div>
+        <label>Gemini API Key <span class="link-subtle" onclick="document.getElementById('modal-apikey').classList.add('open')">(발급방법)</span></label>
+        <input id="gemini-key" type="password" placeholder="AIza… (키 입력 후 현재설정저장)" />
+      </div>
+      <div>
+        <label>모델 <span style="font-size:11px;color:var(--subtext);font-weight:400;">(pro는 정확하고 비쌉니다.)</span></label>
+        <select id="model-select">
+          <option value="gemini-3.1-flash-lite-preview" selected>gemini-3.1-flash-lite-preview</option>
+          <option value="gemini-3.1-flash-preview">gemini-3.1-flash-preview</option>
+          <option value="gemini-2.5-flash-latest">gemini-2.5-flash-latest</option>
+          <option value="gemini-2.5-pro-latest">gemini-2.5-pro-latest</option>
+          <option value="gemini-3.1-pro">gemini-3.1-pro</option>
+        </select>
+      </div>
+      <div style="display:flex;flex-direction:column;justify-content:flex-end;">
+        <label>현재의 설정을 계속 사용하고 싶다면..</label>
+        <button class="btn" onclick="saveSettings()" style="width:100%;padding:7px 10px;font-size:13px;">현재설정저장</button>
+      </div>
+    </div>
+    <div class="grid3">
+      <div>
+        <label>과목</label>
+        <select id="subj-select">
+          <option>수학</option>
+          <option>영어</option>
+          <option>국어</option>
+          <option>과학</option>
+        </select>
+      </div>
+      <div>
+        <label>문서 유형</label>
+        <select id="doctype-select">
+          <option>시험지</option>
+          <option>기본서</option>
+        </select>
+      </div>
+      <div>
+        <label>분석 모드</label>
+        <select id="mode-select">
+          <option value="1" selected>문제만</option>
+          <option value="2">문제+해설</option>
+          <option value="3">프리미엄</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- 파일 업로드 -->
+  <div
+    id="drop-zone"
+    onclick="document.getElementById('file-input').click()"
+    ondragover="onDragOver(event)"
+    ondragleave="onDragLeave(event)"
+    ondrop="onDrop(event)"
+  >
+    <div class="icon">📄</div>
+    <div id="drop-label">PDF 또는 이미지를 드래그하거나 클릭해서 선택</div>
+    <input id="file-input" type="file" accept=".pdf,.png,.jpg,.jpeg" onchange="onFileChange(event)" />
+  </div>
+
+  <!-- 분석 버튼 -->
+  <div class="btn-row">
+    <button class="btn primary" id="btn-analyze" onclick="runAnalyze()" disabled>분석 시작</button>
+  </div>
+
+  <!-- 진행 -->
+  <div id="progress-wrap">
+    <div id="progress-label">준비 중…</div>
+    <div id="progress-bar-track"><div id="progress-bar" class="indeterminate"></div></div>
+  </div>
+
+  <!-- 로그 -->
+  <div id="log-box"></div>
+
+  <!-- 결과 뱃지 -->
+  <div id="result-badge"></div>
+
+  <!-- HWP 생성 -->
+  <div class="card" id="hwp-section">
+    <div class="card-title">HWP 생성</div>
+    <div class="grid2">
+      <div>
+        <label>파일명 (확장자 제외)</label>
+        <input id="hwp-title" type="text" placeholder="문제집" value="문제집" />
+      </div>
+      <div>
+        <label>저장 경로 (비워두면 바탕화면)</label>
+        <input id="hwp-path" type="text" placeholder="C:\Users\…\문제집.hwp" />
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" id="btn-hwp" onclick="runGenerateHwp()">HWP 생성</button>
+      <button class="btn success" id="btn-open" onclick="openLast()" disabled>파일 열기</button>
+    </div>
+  </div>
+
+</div><!-- /wrap -->
+
+<!-- API Key 발급방법 모달 -->
+<div class="modal-backdrop" id="modal-apikey" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box">
+    <button class="modal-close" onclick="document.getElementById('modal-apikey').classList.remove('open')">✕</button>
+    <h3>Gemini API Key 발급방법</h3>
+    <ol>
+      <li><a href="https://aistudio.google.com/" target="_blank">Google AI Studio</a> 접속 및 로그인</li>
+      <li>"Get API key"를 클릭하여 키 생성</li>
+      <li>프로젝트가 없다면 프로젝트를 만든 후 "API keys" 클릭해서 키를 만듭니다.</li>
+    </ol>
+  </div>
+</div>
+
+<script>
+const SERVER = 'http://localhost:8765';
+let analysisResult = null;
+
+// ── 도움말 열기/닫기 ─────────────────────────────────────────────
+function toggleGuide() {
+  const body = document.getElementById('guide-body');
+  const btn  = document.getElementById('guide-toggle');
+  const open = body.style.display !== 'none';
+  body.style.display = open ? 'none' : 'flex';
+  btn.textContent = open ? '도움말 열기' : '도움말 닫기';
+}
+
+// ── 설정 저장/로드 ──────────────────────────────────────────────
+function saveSettings() {
+  localStorage.setItem('ex_gemini', document.getElementById('gemini-key').value);
+  localStorage.setItem('ex_model',  document.getElementById('model-select').value);
+  localStorage.setItem('ex_subj',   document.getElementById('subj-select').value);
+  localStorage.setItem('ex_doc',    document.getElementById('doctype-select').value);
+  localStorage.setItem('ex_mode',   document.getElementById('mode-select').value);
+  addLog('설정을 저장했습니다.', 'ok');
+}
+
+function loadSettings() {
+  const set = (id, key) => {
+    const v = localStorage.getItem(key);
+    if (!v) return;
+    const el = document.getElementById(id);
+    el.value = v;
+    if (el.value !== v) el.value = el.options[0]?.value ?? '';
+  };
+  set('gemini-key',     'ex_gemini');
+  set('model-select',   'ex_model');
+  set('subj-select',    'ex_subj');
+  set('doctype-select', 'ex_doc');
+  set('mode-select',    'ex_mode');
+}
+
+// ── 서버 상태 확인 ──────────────────────────────────────────────
+async function checkServer() {
+  const dot   = document.getElementById('server-dot');
+  const label = document.getElementById('server-label');
+  try {
+    const res = await fetch(`${SERVER}/health`, { signal: AbortSignal.timeout(3000) });
+    if (res.ok) {
+      dot.className = 'ok';
+      label.textContent = '로컬 서버 연결됨 ✓';
+      return true;
+    }
+  } catch {}
+  dot.className = 'err';
+  label.textContent = '로컬 서버 연결 안 됨 — examer1_pc.exe 실행 필요';
+  return false;
+}
+
+// ── 파일 선택 ──────────────────────────────────────────────────
+let selectedFile = null;
+function onFileChange(e) { setFile(e.target.files[0]); }
+function onDragOver(e)  { e.preventDefault(); document.getElementById('drop-zone').classList.add('over'); }
+function onDragLeave()  { document.getElementById('drop-zone').classList.remove('over'); }
+function onDrop(e) {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('over');
+  setFile(e.dataTransfer.files[0]);
+}
+function setFile(file) {
+  if (!file) return;
+  selectedFile = file;
+  const zone = document.getElementById('drop-zone');
+  zone.classList.add('ready');
+  document.getElementById('drop-label').textContent = `선택됨: ${file.name}`;
+  document.getElementById('btn-analyze').disabled = false;
+}
+
+// ── 로그 ──────────────────────────────────────────────────────
+function addLog(msg, type = '') {
+  const box = document.getElementById('log-box');
+  box.style.display = 'block';
+  const line = document.createElement('div');
+  line.className = 'log-line' + (type ? ' ' + type : '');
+  line.textContent = msg;
+  box.appendChild(line);
+  box.scrollTop = box.scrollHeight;
+}
+
+function clearLog() {
+  const box = document.getElementById('log-box');
+  box.innerHTML = '';
+}
+
+// ── 진행바 ────────────────────────────────────────────────────
+function showProgress(label) {
+  document.getElementById('progress-wrap').style.display = 'flex';
+  document.getElementById('progress-label').textContent = label;
+  document.getElementById('progress-bar').classList.add('indeterminate');
+}
+
+function hideProgress() {
+  document.getElementById('progress-wrap').style.display = 'none';
+  document.getElementById('progress-bar').classList.remove('indeterminate');
+}
+
+// ── 분석 ──────────────────────────────────────────────────────
+async function runAnalyze() {
+  if (!selectedFile) return;
+
+  clearLog();
+  document.getElementById('result-badge').style.display = 'none';
+  document.getElementById('hwp-section').style.display = 'none';
+  document.getElementById('btn-analyze').disabled = true;
+  showProgress('AI 분석 중… (수십 초 소요)');
+
+  const fd = new FormData();
+  fd.append('file',            selectedFile);
+  fd.append('gemini_key',      document.getElementById('gemini-key').value);
+  fd.append('model_id',        document.getElementById('model-select').value);
+  fd.append('subj',            document.getElementById('subj-select').value);
+  fd.append('doc_type',        document.getElementById('doctype-select').value);
+  fd.append('analysis_mode',   document.getElementById('mode-select').value);
+  fd.append('force_reanalyze', false);
+
+  try {
+    const res = await fetch(`${SERVER}/analyze`, { method: 'POST', body: fd });
+    const data = await res.json();
+
+    if (!res.ok) { throw new Error(data.detail || '분석 실패'); }
+
+    (data.logs || []).forEach(l => addLog(l));
+    analysisResult = data;
+
+    const cnt = (data.problems || []).length;
+    const badge = document.getElementById('result-badge');
+    badge.style.display = 'block';
+    badge.textContent = `✅ 분석 완료 — 문제 ${cnt}개`;
+
+    document.getElementById('hwp-section').style.display = 'flex';
+    addLog(`분석 완료: ${cnt}문제`, 'ok');
+  } catch (e) {
+    addLog(`오류: ${e.message}`, 'err');
+  } finally {
+    hideProgress();
+    document.getElementById('btn-analyze').disabled = false;
+  }
+}
+
+// ── HWP 생성 ─────────────────────────────────────────────────
+async function runGenerateHwp() {
+  if (!analysisResult) return;
+
+  document.getElementById('btn-hwp').disabled = true;
+  document.getElementById('btn-open').disabled = true;
+  showProgress('HWP 생성 중…');
+  addLog('HWP 생성을 시작합니다…');
+
+  const title   = document.getElementById('hwp-title').value || '문제집';
+  const outPath = document.getElementById('hwp-path').value.trim();
+
+  const body = {
+    problems:      analysisResult.problems,
+    exam_info:     analysisResult.exam_info || {},
+    title,
+    subj:          document.getElementById('subj-select').value,
+    analysis_mode: parseInt(document.getElementById('mode-select').value),
+    out_path:      outPath,
+  };
+
+  try {
+    const res  = await fetch(`${SERVER}/generate-hwp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+
+    if (!res.ok) { throw new Error(data.detail || 'HWP 생성 실패'); }
+
+    (data.logs || '').split('\n').filter(Boolean).forEach(l => addLog(l));
+    addLog(`저장 완료: ${data.path}`, 'ok');
+    document.getElementById('btn-open').disabled = false;
+  } catch (e) {
+    addLog(`오류: ${e.message}`, 'err');
+  } finally {
+    hideProgress();
+    document.getElementById('btn-hwp').disabled = false;
+  }
+}
+
+// ── 파일 열기 ─────────────────────────────────────────────────
+async function openLast() {
+  try {
+    const res = await fetch(`${SERVER}/open-last`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+    addLog(`파일 열기: ${data.path}`, 'ok');
+  } catch (e) {
+    addLog(`오류: ${e.message}`, 'err');
+  }
+}
+
+// ── 초기화 ────────────────────────────────────────────────────
+loadSettings();
+checkServer();
+setInterval(checkServer, 10000); // 10초마다 서버 상태 갱신
+</script>
+</body>
+</html>
