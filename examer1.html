@@ -230,7 +230,7 @@
   <!-- 사용 안내 -->
   <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:12px 16px;display:flex;flex-direction:column;gap:8px;">
     <div style="display:flex;align-items:center;">
-      <span style="font-size:12px;color:var(--subtext);font-weight:700;">사용 방법</span>
+      <span style="font-size:12px;color:var(--subtext);font-weight:700;">사용방법 및 pc프로그램 다운로드</span>
       <button onclick="toggleGuide()" id="guide-toggle" style="margin-left:auto;background:none;border:1px solid var(--border);border-radius:6px;color:var(--subtext);font-size:11px;padding:2px 8px;cursor:pointer;">도움말 열기</button>
     </div>
     <div id="guide-body" style="display:none;flex-direction:column;gap:8px;">
@@ -238,10 +238,11 @@
       <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">2.</span><span style="font-size:13px;color:var(--subtext);">압축을 푼 후에 <strong style="color:var(--text);">examer1_pc.exe</strong> 를 실행</span></div>
       <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;visibility:hidden;">2.</span><span style="font-size:12px;color:var(--subtext);opacity:.7;">(작은 창이 뜨고 로그가 보임. 정상)</span></div>
       <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;visibility:hidden;">2.</span><span style="font-size:12px;color:var(--subtext);opacity:.7;">(위의 서버상태가 "로컬 서버 연결 안 됨"에서 "로컬 서버 연결됨"으로 바뀜)</span></div>
-      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">3.</span><span style="font-size:13px;color:var(--subtext);">아래에서 분석한 후</span></div>
-      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">4.</span><span style="font-size:13px;color:var(--subtext);">분석이 완료되면 저장폴더를 지정(직접 입력 또는 탐색기에서 복사해와서 붙여넣기) 후 한글 생성 클릭.</span></div>
-      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">5.</span><span style="font-size:13px;color:var(--subtext);">1~2초 후 한글 프로그램이 뜨면서 한글문서 생성 시작.</span></div>
-      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;visibility:hidden;">5.</span><span style="font-size:12px;color:var(--subtext);opacity:.7;">(한글 프로그램 접근 허용 팝업이 뜨는 경우 <a href="https://ligh1.tistory.com/203" target="_blank" style="color:var(--blue);">여기</a>를 참조하세요)</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">3.</span><span style="font-size:13px;color:var(--subtext);">아래 창에서 Gemini API Key 또는 Vertex AI JSON 파일 경로 입력 후 모델 선택 후 현재설정저장.</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">4.</span><span style="font-size:13px;color:var(--subtext);">변환하고자 하는 PDF 입력 후 분석시작.</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">5.</span><span style="font-size:13px;color:var(--subtext);">분석이 완료되면 한글 생성 클릭.</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;">6.</span><span style="font-size:13px;color:var(--subtext);">한글 프로그램이 뜨면서 한글문서 생성 시작.</span></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span style="color:var(--accent);font-weight:700;visibility:hidden;">6.</span><span style="font-size:12px;color:var(--subtext);opacity:.7;">(한글 프로그램 접근 허용 팝업이 뜨는 경우 <a href="https://ligh1.tistory.com/203" target="_blank" style="color:var(--blue);">여기</a>를 참조하세요)</span></div>
     </div>
   </div>
 
@@ -251,16 +252,24 @@
     <div class="grid3">
       <div>
         <label>Gemini API Key <span class="link-subtle" onclick="document.getElementById('modal-apikey').classList.add('open')">(발급방법)</span></label>
-        <input id="gemini-key" type="password" placeholder="AIza… (키 입력 후 현재설정저장)" />
+        <input id="gemini-key" type="password" placeholder="AIza… (Gemini 키 또는 아래 Vertex 키 사용)" />
+      </div>
+      <div>
+        <label>Vertex AI JSON 키 경로 <span class="link-subtle" onclick="document.getElementById('modal-vertex').classList.add('open')">(발급방법)</span></label>
+        <div style="display:flex;gap:6px;">
+          <input id="vertex-key-path" type="text" placeholder="파일을 선택하거나 경로 직접 입력" style="flex:1;" readonly />
+          <input id="vertex-key-file" type="file" accept=".json" style="display:none;" onchange="onVertexFileSelect(this)" />
+          <button class="btn" type="button" onclick="document.getElementById('vertex-key-file').click()" style="white-space:nowrap;padding:0 12px;">찾아보기</button>
+        </div>
       </div>
       <div>
         <label>모델 <span style="font-size:11px;color:var(--subtext);font-weight:400;">(pro는 정확하고 비쌉니다.)</span></label>
         <select id="model-select">
           <option value="gemini-3.1-flash-lite-preview" selected>gemini-3.1-flash-lite-preview</option>
-          <option value="gemini-3.1-flash-preview">gemini-3.1-flash-preview</option>
-          <option value="gemini-2.5-flash-latest">gemini-2.5-flash-latest</option>
-          <option value="gemini-2.5-pro-latest">gemini-2.5-pro-latest</option>
-          <option value="gemini-3.1-pro">gemini-3.1-pro</option>
+          <option value="gemini-3-flash-preview">gemini-3-flash-preview</option>
+          <option value="gemini-3.1-pro-preview">gemini-3.1-pro-preview</option>
+          <option value="gemini-2.5-flash">gemini-2.5-flash</option>
+          <option value="gemini-2.5-pro">gemini-2.5-pro</option>
         </select>
       </div>
       <div style="display:flex;flex-direction:column;justify-content:flex-end;">
@@ -347,6 +356,14 @@
 
 </div><!-- /wrap -->
 
+<!-- Vertex AI 발급방법 모달 -->
+<div class="modal-backdrop" id="modal-vertex" onclick="if(event.target===this)this.classList.remove('open')">
+  <div class="modal-box" style="width:860px;max-width:95vw;height:80vh;display:flex;flex-direction:column;">
+    <button class="modal-close" onclick="document.getElementById('modal-vertex').classList.remove('open')">✕</button>
+    <iframe src="vertex_guide.html" style="flex:1;border:none;border-radius:6px;"></iframe>
+  </div>
+</div>
+
 <!-- API Key 발급방법 모달 -->
 <div class="modal-backdrop" id="modal-apikey" onclick="if(event.target===this)this.classList.remove('open')">
   <div class="modal-box">
@@ -373,9 +390,28 @@ function toggleGuide() {
   btn.textContent = open ? '도움말 열기' : '도움말 닫기';
 }
 
+// ── 키 종류에 따른 모델 목록 전환 ───────────────────────────────
+const MODELS_GEMINI  = ['gemini-3.1-flash-lite-preview','gemini-3-flash-preview','gemini-3.1-pro-preview','gemini-2.5-flash','gemini-2.5-pro'];
+const MODELS_VERTEX  = ['gemini-2.5-flash','gemini-2.5-pro','gemini-2.5-flash-lite'];
+
+function updateModelList() {
+  const isVertex = !!document.getElementById('vertex-key-path').value.trim();
+  const models   = isVertex ? MODELS_VERTEX : MODELS_GEMINI;
+  const sel      = document.getElementById('model-select');
+  const prev     = sel.value;
+  sel.innerHTML  = models.map(m => `<option value="${m}">${m}</option>`).join('');
+  sel.value      = models.includes(prev) ? prev : models[0];
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('vertex-key-path').addEventListener('input', updateModelList);
+  document.getElementById('gemini-key').addEventListener('input', updateModelList);
+});
+
 // ── 설정 저장/로드 ──────────────────────────────────────────────
 function saveSettings() {
-  localStorage.setItem('ex_gemini', document.getElementById('gemini-key').value);
+  localStorage.setItem('ex_gemini',      document.getElementById('gemini-key').value);
+  localStorage.setItem('ex_vertex_path', document.getElementById('vertex-key-path').value);
   localStorage.setItem('ex_model',  document.getElementById('model-select').value);
   localStorage.setItem('ex_subj',   document.getElementById('subj-select').value);
   localStorage.setItem('ex_doc',    document.getElementById('doctype-select').value);
@@ -391,7 +427,9 @@ function loadSettings() {
     el.value = v;
     if (el.value !== v) el.value = el.options[0]?.value ?? '';
   };
-  set('gemini-key',     'ex_gemini');
+  set('gemini-key',      'ex_gemini');
+  set('vertex-key-path', 'ex_vertex_path');
+  updateModelList();
   set('model-select',   'ex_model');
   set('subj-select',    'ex_subj');
   set('doctype-select', 'ex_doc');
@@ -413,6 +451,16 @@ async function checkServer() {
   dot.className = 'err';
   label.textContent = '로컬 서버 연결 안 됨 — examer1_pc.exe 실행 필요';
   return false;
+}
+
+// ── Vertex AI JSON 키 파일 선택 ────────────────────────────────
+let selectedVertexFile = null;
+function onVertexFileSelect(input) {
+  const file = input.files[0];
+  if (!file) return;
+  selectedVertexFile = file;
+  document.getElementById('vertex-key-path').value = file.name;
+  updateModelList();
 }
 
 // ── 파일 선택 ──────────────────────────────────────────────────
@@ -474,7 +522,12 @@ async function runAnalyze() {
 
   const fd = new FormData();
   fd.append('file',            selectedFile);
-  fd.append('gemini_key',      document.getElementById('gemini-key').value);
+  fd.append('gemini_key', document.getElementById('gemini-key').value);
+  if (selectedVertexFile) {
+    fd.append('vertex_key_file', selectedVertexFile);
+  } else {
+    fd.append('vertex_key_path', document.getElementById('vertex-key-path').value);
+  }
   fd.append('model_id',        document.getElementById('model-select').value);
   fd.append('subj',            document.getElementById('subj-select').value);
   fd.append('doc_type',        document.getElementById('doctype-select').value);

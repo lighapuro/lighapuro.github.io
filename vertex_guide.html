@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vertex AI 키 발급 가이드</title>
+  <style>
+    :root {
+      --bg:      #1e1e2e;
+      --surface: #313244;
+      --border:  #45475a;
+      --text:    #cdd6f4;
+      --subtext: #585b70;
+      --accent:  #fab387;
+      --green:   #a6e3a1;
+      --blue:    #89b4fa;
+      --radius:  12px;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Malgun Gothic', 'Segoe UI', sans-serif;
+      padding: 40px 24px 60px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    h1 {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 32px;
+      letter-spacing: 1px;
+    }
+    .step {
+      display: flex;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .step-num {
+      flex-shrink: 0;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent);
+      color: #1e1e2e;
+      font-weight: 700;
+      font-size: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .step-body {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px 16px;
+      flex: 1;
+    }
+    .step-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--blue);
+      margin-bottom: 8px;
+    }
+    ul {
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    li {
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+    .arrow {
+      color: var(--subtext);
+      margin: 0 4px;
+    }
+    .tag {
+      display: inline-block;
+      background: rgba(250,179,135,.15);
+      color: var(--accent);
+      border: 1px solid rgba(250,179,135,.3);
+      border-radius: 4px;
+      padding: 1px 7px;
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .note {
+      margin-top: 28px;
+      background: rgba(166,227,161,.08);
+      border: 1px solid rgba(166,227,161,.25);
+      border-radius: var(--radius);
+      padding: 12px 16px;
+      font-size: 12px;
+      color: var(--green);
+      line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>GCP Vertex AI 서비스 계정 키 발급 순서</h1>
+
+  <div class="step">
+    <div class="step-num">1</div>
+    <div class="step-body">
+      <div class="step-title">GCP 콘솔 접속</div>
+      <ul>
+        <li><a href="https://console.cloud.google.com" target="_blank" style="color:var(--blue)">console.cloud.google.com</a> 접속 후 로그인</li>
+        <li>무료 체험 크레딧($300)이 활성화된 계정으로 접속</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">2</div>
+    <div class="step-body">
+      <div class="step-title">Vertex AI API 활성화</div>
+      <ul>
+        <li>검색창 <span class="arrow">→</span> <span class="tag">Vertex AI</span> 검색</li>
+        <li><b>Vertex AI API</b> → <b>사용</b> 클릭</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">3</div>
+    <div class="step-body">
+      <div class="step-title">서비스 계정 생성</div>
+      <ul>
+        <li>검색창 <span class="arrow">→</span> <span class="tag">IAM 및 관리자</span> <span class="arrow">→</span> <span class="tag">서비스 계정</span></li>
+        <li><b>서비스 계정 만들기</b> 클릭</li>
+        <li>역할: <span class="tag">Vertex AI 사용자</span> 선택</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">4</div>
+    <div class="step-body">
+      <div class="step-title">JSON 키 다운로드</div>
+      <ul>
+        <li>만든 서비스 계정 클릭 <span class="arrow">→</span> <b>키</b> 탭</li>
+        <li><b>키 추가</b> <span class="arrow">→</span> <b>새 키 만들기</b> <span class="arrow">→</span> <span class="tag">JSON</span> 선택</li>
+        <li>다운로드된 <code style="color:var(--accent)">.json</code> 파일을 안전한 곳에 보관</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-num">5</div>
+    <div class="step-body">
+      <div class="step-title">앱에 등록</div>
+      <ul>
+        <li><b>API Key 설정</b> 클릭 <span class="arrow">→</span> Vertex AI 섹션</li>
+        <li><b>찾아보기</b>로 JSON 파일 선택 <span class="arrow">→</span> <b>OK</b></li>
+        <li>Gemini API 키란은 비워도 됩니다</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="note">
+    ※ Vertex AI JSON 키가 등록되면 Gemini API 키 대신 GCP 크레딧(₩441,614)으로 자동 과금됩니다.<br>
+    ※ 서비스 계정 JSON 파일은 외부에 유출되지 않도록 주의하세요.
+  </div>
+
+</body>
+</html>
