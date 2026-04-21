@@ -77,6 +77,48 @@
       text-align: center;
       line-height: 1.6;
     }
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-backdrop.open { display: flex; }
+    .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 32px 28px;
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: relative;
+    }
+    .modal h2 {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .modal a {
+      color: var(--blue);
+      text-decoration: none;
+      font-size: 15px;
+    }
+    .modal a:hover { text-decoration: underline; }
+    .modal-close {
+      position: absolute;
+      top: 10px; right: 14px;
+      background: none;
+      border: none;
+      color: var(--subtext);
+      font-size: 20px;
+      cursor: pointer;
+    }
   </style>
 </head>
 <body>
@@ -95,12 +137,22 @@
       <div class="app-desc">pdf를 한글로</div>
     </a>
 
-    <a class="app-card" href="https://github.com/lighapuro/hwp_to_pdf_oneclick/releases/download/v1.0.0/hwp_to_pdf_oneclick-v1.0.0.exe">
+    <div class="app-card" onclick="document.getElementById('pdfModal').classList.add('open')">
       <div class="app-icon">🔄</div>
       <div class="app-name">pdf 변환기</div>
       <div class="app-desc">pdf를 hwp로 일괄변환</div>
-    </a>
+    </div>
 
+  </div>
+
+  <!-- pdf 변환기 modal -->
+  <div class="modal-backdrop" id="pdfModal" onclick="if(event.target===this)this.classList.remove('open')">
+    <div class="modal">
+      <button class="modal-close" onclick="document.getElementById('pdfModal').classList.remove('open')">✕</button>
+      <h2>pdf 변환기</h2>
+      <a href="https://blog.kakaocdn.net/dna/c42ri2/dJMcagSMxRF/AAAAAAAAAAAAAAAAAAAAABiHw_cuv6TCRHDUv5MdRluuAs9ClQG9S8JaTsGyGqLU/hwp_to_pdf_oneclick-v1.0.0.exe?credential=yqXZFxpELC7KVnFOS48ylbz2pIh7yKj8&expires=1777561199&allow_ip=&allow_referer=&signature=fU%2BSuSL6ARI%2F3zLap1Uj6RwAY8A%3D&attach=1&knm=tfile.exe" download>⬇ hwp_to_pdf_oneclick.exe 다운</a>
+      <a href="https://ligh1.tistory.com/204" target="_blank">📖 사용법</a>
+    </div>
   </div>
 
 </body>
