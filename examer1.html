@@ -384,6 +384,25 @@
     </div>
   </div>
 
+  <!-- LaTeX PDF 생성 -->
+  <div class="card" id="pdf-section" style="display:none;">
+    <div class="card-title">LaTeX PDF 생성</div>
+    <div class="grid2">
+      <div>
+        <label>파일명 (확장자 제외)</label>
+        <input id="pdf-title" type="text" placeholder="문제집" value="문제집" />
+      </div>
+      <div>
+        <label>저장 경로 (비워두면 바탕화면)</label>
+        <input id="pdf-path" type="text" placeholder="C:\Users\…\문제집.pdf" />
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn primary" id="btn-pdf" onclick="runGeneratePdf()">LaTeX PDF 생성</button>
+      <button class="btn success" id="btn-open-pdf" onclick="openLastPdf()" disabled>파일 열기</button>
+    </div>
+  </div>
+
 </div><!-- /wrap -->
 
 <!-- Vertex AI 발급방법 모달 -->
@@ -627,6 +646,7 @@ async function runAnalyze() {
   clearLog();
   document.getElementById('result-badge').style.display = 'none';
   document.getElementById('hwp-section').style.display = 'none';
+  document.getElementById('pdf-section').style.display = 'none';
   document.getElementById('btn-analyze').disabled = true;
   hideProgress();
 
@@ -692,6 +712,7 @@ async function runAnalyze() {
     badge.style.display = 'block';
     badge.textContent = `✅ 분석 완료 — 문제 ${cnt}개`;
     document.getElementById('hwp-section').style.display = 'flex';
+    document.getElementById('pdf-section').style.display = 'flex';
     addLog(`✅ 분석 완료: ${cnt}문제`, 'ok');
   } catch (e) {
     addLog(`오류: ${e.message}`, 'err');
@@ -739,6 +760,57 @@ async function runGenerateHwp() {
   } finally {
     hideProgress();
     document.getElementById('btn-hwp').disabled = false;
+  }
+}
+
+// ── LaTeX PDF 생성 ────────────────────────────────────────────
+async function runGeneratePdf() {
+  if (!analysisResult) return;
+
+  document.getElementById('btn-pdf').disabled = true;
+  document.getElementById('btn-open-pdf').disabled = true;
+  showProgress('LaTeX PDF 생성 중…');
+  addLog('LaTeX PDF 생성을 시작합니다…');
+
+  const title   = document.getElementById('pdf-title').value || '문제집';
+  const outPath = document.getElementById('pdf-path').value.trim();
+
+  const body = {
+    problems:      analysisResult.problems,
+    exam_info:     analysisResult.exam_info || {},
+    title,
+    subj:          document.getElementById('subj-select').value,
+    analysis_mode: parseInt(document.getElementById('mode-select').value),
+    out_path:      outPath,
+  };
+
+  try {
+    const res  = await fetch(`${SERVER}/generate-pdf`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    const data = await res.json();
+    if (!res.ok) { throw new Error(data.detail || 'PDF 생성 실패'); }
+    addLog(`저장 완료: ${data.path}`, 'ok');
+    document.getElementById('btn-open-pdf').disabled = false;
+  } catch (e) {
+    addLog(`오류: ${e.message}`, 'err');
+  } finally {
+    hideProgress();
+    document.getElementById('btn-pdf').disabled = false;
+  }
+}
+
+// ── PDF 파일 열기 ─────────────────────────────────────────────
+async function openLastPdf() {
+  try {
+    const res = await fetch(`${SERVER}/open-last-pdf`);
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail);
+    addLog(`파일 열기: ${data.path}`, 'ok');
+  } catch (e) {
+    addLog(`오류: ${e.message}`, 'err');
   }
 }
 
