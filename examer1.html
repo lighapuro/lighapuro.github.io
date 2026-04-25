@@ -793,6 +793,7 @@ async function runGeneratePdf() {
     const data = await res.json();
     if (!res.ok) { throw new Error(data.detail || 'PDF 생성 실패'); }
     addLog(`저장 완료: ${data.path}`, 'ok');
+    if (data.explanation_path) addLog(`해설 저장 완료: ${data.explanation_path}`, 'ok');
     document.getElementById('btn-open-pdf').disabled = false;
   } catch (e) {
     addLog(`오류: ${e.message}`, 'err');
