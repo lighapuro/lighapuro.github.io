@@ -291,7 +291,6 @@
           <option>영어</option>
           <option>국어</option>
           <option>과학</option>
-          <option>일본어</option>
         </select>
       </div>
       <div>
@@ -309,6 +308,11 @@
           <option value="3">프리미엄</option>
         </select>
       </div>
+    </div>
+    <div style="margin-top:8px">
+      <label style="display:inline-flex;align-items:center;gap:6px;cursor:pointer">
+        <input type="checkbox" id="cb-translate-jp"> 일본어 → 한국어 번역
+      </label>
     </div>
   </div>
 
@@ -473,7 +477,8 @@ function saveSettings() {
   localStorage.setItem('ex_model',  document.getElementById('model-select').value);
   localStorage.setItem('ex_subj',   document.getElementById('subj-select').value);
   localStorage.setItem('ex_doc',    document.getElementById('doctype-select').value);
-  localStorage.setItem('ex_mode',   document.getElementById('mode-select').value);
+  localStorage.setItem('ex_mode',         document.getElementById('mode-select').value);
+  localStorage.setItem('ex_translate_jp', document.getElementById('cb-translate-jp').checked);
   addLog('설정을 저장했습니다.', 'ok');
 }
 
@@ -497,6 +502,8 @@ function loadSettings() {
   set('subj-select',    'ex_subj');
   set('doctype-select', 'ex_doc');
   set('mode-select',    'ex_mode');
+  const savedTranslate = localStorage.getItem('ex_translate_jp');
+  if (savedTranslate !== null) document.getElementById('cb-translate-jp').checked = savedTranslate === 'true';
 }
 
 // ── 서버 상태 확인 ──────────────────────────────────────────────
@@ -695,8 +702,9 @@ async function runAnalyze() {
       fd.append('model_id',        document.getElementById('model-select').value);
       fd.append('subj',            document.getElementById('subj-select').value);
       fd.append('doc_type',        document.getElementById('doctype-select').value);
-      fd.append('analysis_mode',   document.getElementById('mode-select').value);
-      fd.append('force_reanalyze', false);
+      fd.append('analysis_mode',     document.getElementById('mode-select').value);
+      fd.append('force_reanalyze',   false);
+      fd.append('translate_to_korean', document.getElementById('cb-translate-jp').checked);
       endpoint = '/analyze-job';
     }
 
